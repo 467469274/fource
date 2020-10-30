@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>d3OnlyTranslateZoom.html</title>
+</head>
+<body>
+<div id="chart"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js"></script>
+<script>
+  let data = [80, 120, 150]
+  let x = 200, y = 20, h = 200
+  let svg = d3.select('#chart').append('svg').attr("width", 800).attr("height", 300)
+ 
+  let yScale = d3.scaleLinear()
+  yScale.domain(d3.extent(data))
+    .range([d3.extent(data)[0], h])
+ 
+  let yzoom = d3.zoom()
+    .on('zoom', zoomed)
+  function zoomed() {
+    let Y = d3.event.transform.rescaleY(yScale)
+    // let trans = d3.event.transform
+ 
+    svg.selectAll('.circle')
+      .attr('cy', n=>{
+        // console.log(`n is: ${JSON.stringify(n)}`)
+        // console.log(`yScale(n) is: ${JSON.stringify(yScale(n))}`)
+        return Y(n)
+      })
+    svg.select('line')
+      .attr('y1', n=>Y(n.y1))
+      .attr('y2', n=>Y(n.y2))
+  }
+  svg.call(yzoom)
+  let line = svg.datum({y1: 0, y2: h}).append('line')
+    .attr('x1', x)
+    .attr('y1', n=>yScale(n.y1))
+    .attr('x2', x)
+    .attr('y2', n=>yScale(n.y2))
+    .attr('stroke', '#000')
+  console.log(line)
+  let circles = svg.selectAll('.circle')
+    .data(data)
+    .enter().append('circle').attr('class', 'circle')
+    .attr('cx', x)
+    .attr('cy', n => yScale(n))
+    .attr('r', 10)
+ 
+</script>
+</body>
+</html>

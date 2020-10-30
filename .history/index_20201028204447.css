@@ -1,0 +1,59 @@
+
+    .link {
+        fill: none;
+        stroke: #666;
+        stroke-width: 1.5px;
+      }
+      
+      #licensing {
+        fill: green;
+      }
+  
+      .link.licensing {
+        stroke: green;
+      }
+  
+      .link.resolved {
+        stroke-dasharray: 0, 2 1;
+      }
+  
+      circle {
+        fill: #ccc;
+        stroke: #333;
+        stroke-width: 1.5px;
+      }
+      #forceMap {
+        width: 500px;
+        height: 500px;
+        background: #fff;
+        margin-bottom: 10px;
+        z-index: 1;
+      }
+      #thumbMap,#dragThumb {
+        width: 100px;
+        height: 100px;
+        background: #ececec;
+        position: absolute;
+        left: 100px;
+        top: 100px;
+        z-index: 99;
+      }
+      #dragThumb{
+        background: none;
+        border: 2px solid blue;
+        z-index: 100;
+      }
+      
+      text {
+        font: 12px Microsoft YaHei;
+        pointer-events: none;
+        text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+      }
+  
+      .linetext {
+        font-size: 12px Microsoft YaHei;
+      }
+      .fuckddq {
+        background: paleturquoise;
+        fill: paleturquoise !important;
+      }

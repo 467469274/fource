@@ -1,0 +1,213 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>关系图示例</title>
+    <style>
+      .div-left {
+        float: right;
+      }
+    </style>
+    <!--  <script charset="utf-8" src="/ews/js/r2d3.min.js"></script> -->
+    <script charset="utf-8" src="d3.v3.min.js"></script>
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>    
+    <script>
+      function cxxc(data) {
+        // alert("跳转后台自己写！");
+      }
+      function hy() {
+        circle
+          .style("fill", function (node) {
+            var color; //圆圈背景色
+            var link = links[node.index];
+            //根据客户不同定义圆圈颜色
+            if (node.qtype == "01") {
+              color = "#EE6A50";
+            } else {
+              color = "	#4F94CD";
+            }
+            return color;
+          })
+          .style("stroke", function (node) {
+            var color; //圆圈线条的颜色
+            var link = links[node.index];
+            if (node.qtype == "01") {
+              if (node.sfwh == 0) {
+                color = "#FF4500";
+              } else {
+                color = "#EE6A50";
+              }
+            } else {
+              if (node.sfwh == 0) {
+                color = "#FF4500";
+              } else {
+                color = "#4F94CD";
+              }
+            }
+            return color;
+          });
+        circle.style("stroke-width", 1);
+        text.style("fill", "#000000");
+        edges_text.style("fill", "#000000");
+        path.style("stroke-width", 0.5);
+        path.style("stroke", function (d) {
+          return "red";
+        });
+      }
+      function lxclick() {
+        var aa = [];
+        if (document.getElementById("lxa").checked) {
+          aa[aa.length] = "01";
+        }
+        if (document.getElementById("lxb").checked) {
+          aa[aa.length] = "02";
+        }
+        if (document.getElementById("lxc").checked) {
+          aa[aa.length] = "03";
+        }
+
+        if (aa.length == 0) {
+          hy();
+        } else {
+          edges_text.style("fill", function (line) {
+            console.log(line);
+            var color = "#BEBEBE";
+            if (aa.indexOf(line.rela) >= 0) {
+              color = "#000000";
+            }
+            return color;
+          });
+
+          text.style("fill", function (data) {
+            var color = "#BEBEBE";
+            for (var i = 0; i < links.length; i++) {
+              if (aa.indexOf(links[i].rela) >= 0) {
+                if (
+                  links[i].source.name == data.name ||
+                  links[i].target.name == data.name
+                ) {
+                  color = "#000000";
+                }
+              }
+            }
+            return color;
+          });
+          circle.style("stroke", function (data) {
+            var color = "#FFFAF0";
+            for (var i = 0; i < links.length; i++) {
+              if (aa.indexOf(links[i].rela) >= 0) {
+                if (
+                  links[i].source.name == data.name ||
+                  links[i].target.name == data.name
+                ) {
+                  if (data.qtype == "01") {
+                    if (data.sfwh == 0) {
+                      color = "#FF4500";
+                    } else {
+                      color = "#EE6A50";
+                    }
+                  } else {
+                    if (data.sfwh == 0) {
+                      color = "#FF4500";
+                    } else {
+                      color = "#4F94CD";
+                    }
+                  }
+                }
+              }
+            }
+            return color;
+          });
+          circle.style("fill", function (data) {
+            var color = "#FFFAF0"; //圆圈背景色
+            for (var i = 0; i < links.length; i++) {
+              if (aa.indexOf(links[i].rela) >= 0) {
+                if (
+                  links[i].source.name == data.name ||
+                  links[i].target.name == data.name
+                ) {
+                  //根据客户不同定义圆圈颜色
+                  if (data.qtype == "01") {
+                    color = "#EE6A50";
+                  } else {
+                    color = "	#4F94CD";
+                  }
+                }
+              }
+            }
+            return color;
+          });
+          circle.style("stroke-width", function (data) {
+            var cd = 0.5;
+            for (var i = 0; i < links.length; i++) {
+              if (aa.indexOf(links[i].rela) >= 0) {
+                if (
+                  links[i].source.name == data.name ||
+                  links[i].target.name == data.name
+                ) {
+                  cd = 2;
+                }
+              }
+            }
+            return cd;
+          });
+          //处理弧线
+          path.style("stroke-width", function (line) {
+            if (aa.indexOf(line.rela) >= 0) {
+              return 5;
+            } else {
+              return 0.5;
+            }
+          });
+
+          path.style("stroke", function (line) {
+            return 'pink';
+          });
+        }
+      }
+    </script>
+  </head>
+  <style>
+    .link {
+      fill: none;
+      stroke: #666;
+      stroke-width: 1.5px;
+    }
+
+    #licensing {
+      fill: green;
+    }
+
+    .link.licensing {
+      stroke: green;
+    }
+
+    .link.resolved {
+      stroke-dasharray: 0, 2 1;
+    }
+
+    circle {
+      fill: #ccc;
+      stroke: #333;
+      stroke-width: 1.5px;
+    }
+
+    text {
+      font: 12px Microsoft YaHei;
+      pointer-events: none;
+      text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+    }
+
+    .linetext {
+      font-size: 12px Microsoft YaHei;
+    }
+  </style>
+  <body id="body" bgcolor="#F0Ffff">
+    <script>
+      var links
+        $.ajax('./links.json',function(data){
+            console.log(data);
+            links = data.links
+        })
+    </script>
+  </body>
+</html>

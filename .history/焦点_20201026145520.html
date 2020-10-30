@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+
+	<body>
+		<div id="test-svg">
+		</div>
+	</body>
+	<script src="https://d3js.org/d3.v5.js"></script>
+	<script type="text/javascript" src="./2D.js"></script>
+	<script>
+		window.onload = function() {
+            init()
+            var clickTime = "";
+      var startLoc = [];
+      var endLoc = [];
+      var drawFlag = "";
+			// 数据
+			var data = [{
+				date: new Date(2019, 3, 24),
+				value: 23.24
+			}, {
+				date: new Date(2019, 3, 25),
+				value: 72.15
+			}, {
+				date: new Date(2019, 3, 26),
+				value: 38.84
+			}, {
+				date: new Date(2019, 3, 27),
+				value: 58.62
+			}, {
+				date: new Date(2019, 3, 30),
+				value: 10.80
+			}, {
+				date: new Date(2019, 4, 1),
+				value: 85.47
+			}];
+
+			var data2 = [{
+				date: new Date(2019, 3, 24),
+				value: 18.24
+			}, {
+				date: new Date(2019, 4, 1),
+				value: 90.47
+			}];
+
+			var width = 800,
+				height = 400,
+				padding = {
+					top: 40,
+					right: 40,
+					bottom: 40,
+					left: 40
+				};
+
+			var colors = d3.schemeSet2;
+			var svg = d3.select("#test-svg")
+				.append('svg')
+				.attr('width', width + 'px')
+				.attr('height', height + 'px');
+
+			// x轴:时间轴
+			var xScale = d3.scaleTime()
+				.domain(d3.extent(data, function(d) {
+					return d.date;
+				}))
+				.range([padding.left, width - padding.right]);
+
+			var xAxis = d3.axisBottom()
+				.scale(xScale)
+				.tickSize(10);
+
+			svg.append('g')
+				.call(xAxis)
+				.attr("transform", "translate(0," + (height - padding.bottom) + ")")
+				.selectAll("text")
+				.attr("font-size", "10px")
+				.attr("dx", "50px");
+
+			var ymax = d3.max(data, function(d) {
+				return d.value;
+			});
+
+			// y轴
+			var yScale = d3.scaleLinear()
+				.domain([0, ymax])
+				.range([height - padding.bottom, padding.top]);
+
+			var yAxis = d3.axisLeft()
+				.scale(yScale)
+				.ticks(10);
+
+			svg.append('g')
+				.call(yAxis)
+				.attr("transform", "translate(" + padding.left + ",0)");
+
+			// 曲线	
+			var curveLine = d3.line()
+				.x(function(d) {
+					return xScale(d.date);
+				})
+				.y(function(d) {
+					return yScale(d.value);
+				})
+				.curve(d3.curveCatmullRom.alpha(0.5));
+
+			// 直线
+			var line = d3.line()
+				.x(function(d) {
+					return xScale(d.date);
+				})
+				.y(function(d) {
+					return yScale(d.value);
+				});
+
+			var container = svg.append("g");
+
+			container.append("path")
+				.datum(data)
+				.attr("d", curveLine)
+				.attr("class", "cmn")
+				.attr('stroke', '#FFA354')
+				.attr("fill", "none");
+
+			container.append("path")
+				.datum(data2)
+				.attr("d", line)
+				.attr("class", "csmn")
+				.attr('stroke', '#FFA354')
+                .attr("fill", "none");
+                
+
+
+
+
+
+        var shapes = [];
+
+var children = container.selectAll("path");
+// 获取path
+children[0]
+for(var i = 0; i < children._groups[0].length; i++) {
+    var child = children._groups[0][i];
+    var shape = new Path(child);
+    shapes.push(shape);
+}
+
+
+
+
+// 计算交点
+var inter = Intersection.intersectShapes(shapes[0], shapes[1]);
+// 绘制交点
+svg.selectAll("circle")
+    .data(inter.points)
+    .join("circle")
+    .attr("r", 3)
+    .attr("cx", function(d) {
+        return d.x;
+    })
+    .attr("cy", function(d) {
+        return d.y;
+    })
+    .attr("fill", "steelblue");
+    function init(e) {
+    if ( window.svgDocument == null )
+        svgDocument = e.target.ownerDocument;
+
+    azap   = new AntiZoomAndPan();
+    mouser = new Mouser();
+
+    var infoElem = svgDocument.getElementById("info");
+    var background = svgDocument.getElementById("background");
+
+    info = infoElem.firstChild;
+    
+    azap.appendNode(infoElem);
+    azap.appendNode(mouser.svgNode);
+    azap.appendNode(background);
+
+    loadShapes();
+    showIntersections();
+}
+
+    function drawSquare() {
+        var rect = svg
+          .append("rect")
+          .attr("width", 0)
+          .attr("height", 0)
+          .attr("fill", "rgba(33,20,50,0.3)")
+          .attr("stroke", "#ccc")
+          .attr("stroke-width", "2px")
+          .attr("transform", "translate(0,0)")
+          .attr("id", "squareSelect");
+
+        svg.on("mousedown", function () {
+          if (d3.event.target.localName === "svg") {
+            clickTime = new Date().getTime(); //mark start time
+            drawFlag = true; //以drawFlag作为可执行圈选的标记
+            rect.attr(
+              "transform",
+              "translate(" + d3.event.layerX + "," + d3.event.layerY + ")"
+            );
+            startLoc = [d3.event.layerX, d3.event.layerY];
+          }
+        });
+
+        svg.on("mousemove", function () {
+          //判断事件target
+          if (drawFlag == true) {
+            var width = d3.event.layerX - startLoc[0];
+            var height = d3.event.layerY - startLoc[1];
+            if (width < 0) {
+              rect.attr(
+                "transform",
+                "translate(" + d3.event.layerX + "," + startLoc[1] + ")"
+              );
+            }
+            if (height < 0) {
+              rect.attr(
+                "transform",
+                "translate(" + startLoc[0] + "," + d3.event.layerY + ")"
+              );
+            }
+            if (height < 0 && width < 0) {
+              rect.attr(
+                "transform",
+                "translate(" + d3.event.layerX + "," + d3.event.layerY + ")"
+              );
+            }
+            rect
+              .attr("width", Math.abs(width))
+              .attr("height", Math.abs(height));
+          }
+        });
+
+        svg.on("mouseup", function () {
+          if (drawFlag == true) {
+            drawFlag = false;
+            let shape = new Rectangle(rect._groups[0][0]);
+            console.log(shape)
+            shape.realize();
+            shape.callback = function(){
+                Intersection.intersectShapes( shapes[0] ,shape).points
+            };
+            // endLoc = [d3.event.layerX, d3.event.layerY]; // 框选结束的点的坐标
+            // var leftTop = []; // LT 为框选左上角 x,y
+            // var rightBottom = []; // LT 为框选左上角 x,y
+            // if (endLoc[0] >= startLoc[0]) {
+            //   leftTop[0] = startLoc[0];
+            //   rightBottom[0] = endLoc[0];
+            // } else {
+            //   leftTop[0] = endLoc[0];
+            //   rightBottom[0] = startLoc[0];
+            // }
+
+            // if (endLoc[1] >= startLoc[1]) {
+            //   leftTop[1] = startLoc[1];
+            //   rightBottom[1] = endLoc[1];
+            // } else {
+            //   leftTop[1] = endLoc[1];
+            //   rightBottom[1] = startLoc[1];
+            // }
+            // console.log(leftTop, rightBottom);
+            // //最后通过和node的坐标比较，确定哪些点在圈选范围
+            // var nodes = d3.selectAll(".regionNode").attr("temp", function (d) {
+            //   // console.log(d.x,d.y,d,d3.event.target.localName)
+            //   console.dir(d);
+            //   if (
+            //     d.x < rightBottom[0] &&
+            //     d.x > leftTop[0] &&
+            //     d.y > leftTop[1] &&
+            //     d.y < rightBottom[1]
+            //   ) {
+            //     d3.select(this).attr("class", "fuckddq");
+            //   }
+            // });
+            // rect.attr("width", 0).attr("height", 0);
+          }
+        });
+      }
+      drawSquare();
+        }
+
+
+
+
+     
+	</script>
+
+</html>

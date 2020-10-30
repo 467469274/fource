@@ -1,0 +1,46 @@
+{
+    "data":[
+        {
+          "targetname": "哇哈哈",
+          "relaname": "1关系",
+          "sourcename": "洗刷刷",
+          "source": "bh001",
+          "target": "bh002"
+        },
+        {
+          "targetname": "哇哈哈",
+          "relaname": "2关系",
+          "sourcename": "洗刷刷",
+          "source": "bh001",
+          "target": "bh002"
+        },
+        {
+          "targetname": "哇哈哈",
+          "relaname": "3关系",
+          "sourcename": "洗刷刷",
+          "source": "bh001",
+          "target": "bh002"
+        },
+        {
+          "targetname": "喜洋洋",
+          "relaname": "2关系",
+          "sourcename": "美洋洋",
+          "source": "bh003",
+          "target": "bh004"
+        },
+        {
+          "targetname": "洗刷刷",
+          "relaname": "3关系",
+          "sourcename": "喜洋洋",
+          "source": "bh003",
+          "target": "bh001"
+        },
+        {
+          "targetname": "喜洋洋",
+          "relaname": "1关系",
+          "sourcename": "洗刷刷",
+          "source": "bh004",
+          "target": "bh003"
+        }
+      ]
+}

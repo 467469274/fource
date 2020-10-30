@@ -1,0 +1,518 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>关系图示例</title>
+    <style>
+      .div-left {
+        float: right;
+      }
+    </style>
+    <!--  <script charset="utf-8" src="/ews/js/r2d3.min.js"></script> -->
+    <!-- <script charset="utf-8" src="d3.v4.min.js"></script> -->
+    <script src="http://d3js.org/d3.v5.min.js"></script>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+    <script src="./index.js"></script>
+    <link rel="stylesheet" href="./index.css" />
+  </head>
+  <body id="body" bgcolor="#F0Ffff">
+    <div id="thumbMap"></div>
+    <script>
+              var clickTime = "";
+              var links = [
+                {
+                  targetname: "哇哈哈",
+                  relaname: "1关系",
+                  sourcename: "洗刷刷",
+                  source: "bh001",
+                  target: "bh002",
+                  value:12,
+                },
+                {
+                  targetname: "哇哈哈",
+                  relaname: "2关系",
+                  sourcename: "洗刷刷",
+                  source: "bh001",
+                  value:12,
+                  target: "bh002",
+                },
+                {
+                  targetname: "哇哈哈",
+                  relaname: "3关系",
+                  sourcename: "洗刷刷",
+                  value:12,
+                  source: "bh001",
+                  target: "bh002",
+                },
+                {
+                  targetname: "喜洋洋",
+                  relaname: "2关系",
+                  sourcename: "美洋洋",
+                  value:12,
+                  source: "bh003",
+                  target: "bh004",
+                },
+                {
+                  targetname: "洗刷刷",
+                  relaname: "3关系",
+                  value:12,
+                  sourcename: "喜洋洋",
+                  source: "bh003",
+                  target: "bh001",
+                },
+                {
+                  targetname: "喜洋洋",
+                  relaname: "1关系",
+                  sourcename: "洗刷刷",
+                  source: "bh004",
+                  value:12,
+                  target: "bh003",
+                },
+              ];
+              //关系分组
+              var linkGroup = {};
+              var tips = {};
+              var startLoc = [];
+              var endLoc = [];
+              var drawFlag = "";
+              const circleInfo = {
+                r: 25,
+                stroke: 1,
+              };
+
+              // console.log(Intersection.intersectShapes)
+              const lineDots = {};
+              //对连接线进行统计和分组，不区分连接线的方向，只要属于同两个实体，即认为是同一组
+              var linkmap = {};
+              for (var i = 0; i < links.length; i++) {
+                var key =
+                  links[i].source < links[i].target
+                    ? links[i].source + ":" + links[i].target
+                    : links[i].target + ":" + links[i].source;
+                if (!linkmap.hasOwnProperty(key)) {
+                  linkmap[key] = 0;
+                }
+                linkmap[key] += 1;
+                if (!linkGroup.hasOwnProperty(key)) {
+                  linkGroup[key] = [];
+                }
+                linkGroup[key].push(links[i]);
+              }
+              //为每一条连接线分配size属性，同时对每一组连接线进行编号
+              for (var i = 0; i < links.length; i++) {
+                var key =
+                  links[i].source < links[i].target
+                    ? links[i].source + ":" + links[i].target
+                    : links[i].target + ":" + links[i].source;
+                links[i].size = linkmap[key];
+                //同一组的关系进行编号
+                var group = linkGroup[key];
+                var keyPair = key.split(":");
+                var type = "noself"; //标示该组关系是指向两个不同实体还是同一个实体
+                if (keyPair[0] == keyPair[1]) {
+                  type = "self";
+                }
+                //给节点分配编号
+                setLinkNumber(group, type);
+              }
+              //定义参数
+              var nodes = {};
+              for (var i = 0; i < links.length; i++) {
+                var link = links[i];
+                link.selected = false;
+                link.previouslySelected = false;
+                link.source = nodes[link.source] = {name:link.source}
+                link.target = nodes[link.target] = {name:link.target}
+              }
+              let ars = []
+              Object.keys(nodes).forEach(key=>{
+                ars.push(nodes[key])
+              })
+              console.log(ars)
+              links.forEach(function (e) {
+              var sourceNode = ars.filter(function (n) {
+                          return n.name === e.source;
+                      })[0],
+                      targetNode = ars.filter(function (n) {
+                          return n.name === e.target;
+                      })[0];
+              e.source = sourceNode
+              e.target = targetNode
+          });
+          console.log(links)
+
+
+              
+              //可以定义展示大小
+              var width = 800,
+                height = 800;
+                var force = d3.forceSimulation()
+            .force("link",d3.forceLink())
+            .force("charge",d3.forceManyBody())
+            .force("center",d3.forceCenter());
+            //生成节点数据
+            force.nodes(ars)
+            // console.log(ars)
+        //生成边数据
+        // force.force("link")
+            // .links(links)
+            // .distance(function(d){//每一边的长度
+            //   console.log(d)
+            //     return d.value*100;
+            // })
+            // console.log(links)
+        // //设置图形的中心位置
+        // force.force("center")
+        //     .x(width/2)
+        //     .y(height/2);
+
+
+
+
+
+        
+              // var force = d3.layout
+              //   .force() //layout将json格式转化为力学图可用的格式
+              //   .nodes(d3.values(nodes)) //设定节点数组
+              //   .links(links) //设定连线数组
+              //   .size([width, height]) //作用域的大小
+              //   .linkDistance(300) //连接线长度
+              //   .charge(-2000) //顶点的电荷数。该参数决定是排斥还是吸引，数值越小越互相排斥
+              //   .on("tick", tick) //指时间间隔，隔一段时间刷新一次画面
+              //   .start() //开始转换
+                
+              var svg = d3
+                .select("body")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height);
+
+              //箭头
+              var marker = svg
+                .append("marker")
+                .attr("id", function (d) {
+                  return d;
+                })
+                .attr("id", "resolved")
+                .attr("markerUnits", "strokeWidth") //设置为strokeWidth箭头会随着线的粗细发生变化
+                .attr("markerUnits", "userSpaceOnUse")
+                .attr("viewBox", "0 -5 10 10") //坐标系的区域
+                .attr("refX", 32) //箭头坐标
+                .attr("refY", -1)
+                .attr("markerWidth", 12) //标识的大小
+                .attr("markerHeight", 12)
+                .attr("orient", "auto") //绘制方向，可设定为：auto（自动确认方向）和 角度值
+                .attr("stroke-width", 2) //箭头宽度
+                .append("path")
+                .attr("d", "M0,-5L10,0L0,5") //箭头的路径
+                .attr("fill", "#6c6c6c"); //箭头颜色
+
+              // 将连接线设置为曲线
+              var path = drawPath(svg)
+                .on("mousemove", function (e) {
+                  setTips(e, `${e.sourcename}=>${e.targetname}`);
+                })
+                .on("mouseout", function (e) {
+                  initTips(e);
+                })
+                console.log(path)
+                //设置直线上的字
+              var edges_text = drawText(svg)
+
+              //圆圈
+              var circle = drawCircle(svg)
+                .on("dblclick", function (node) {
+                  // alert("names:"+node.names+" , name:"+node.name);
+                  console.log(123);
+                })
+                //给圆圈添加单机事件
+                .on("click", function (node) {
+                  //单击时圆圈上的字
+                  text.style("fill", function (data) {
+                    return "#fff";
+                  });
+                  //单击时圆圈边线宽度
+                  circle.style("stroke-width", function (data) {
+                    return 10;
+                  });
+                  //单击时圆圈背景色
+                  circle.style("fill", function (data) {
+                    var color = "#FFFAF0"; //圆圈背景色
+                  });
+                  //单击时圆圈边缘线颜色
+                  circle.style("stroke", function (data) {
+                    return "red";
+                  });
+                  //单击时让连接线加粗
+                  path.style("stroke-width", function (line) {
+                    return 5;
+                  });
+                  path.style("stroke", function (line) {
+                    return "red";
+                  });
+                  //单击时让连接线文字
+                  edges_text.style("fill", function (line) {
+                    return "#000000";
+                  });
+                })
+                .on("mousemove", function (e) {
+                  setTips(e);
+                })
+                .on("mouseout", function (e) {
+                  initTips(e);
+                })
+
+              //圆圈上的字
+              var text = drawCircleText(svg)
+
+              //定义坐标
+              function tick() {
+                // azap.update()
+                path.attr("d", pathD);
+                circle.attr("transform", transform1); //圆圈
+                text.attr("transform", transform2); //顶点文字
+                edges_text.attr("transform", function (d, i) {
+                  if (d.target.x < d.source.x) {
+                    bbox = this.getBBox();
+                    rx = bbox.x + bbox.width / 2;
+                    ry = bbox.y + bbox.height / 2;
+                    return "rotate(180 " + rx + " " + ry + ")";
+                  } else {
+                    return "rotate(0)";
+                  }
+                });
+                drawThumb()
+              }
+              function initTips(data) {
+                Object.keys(tips).forEach((key) => {
+                  if (key === data.name) {
+                  }
+                  tips[key].attr("display", "none");
+                });
+              }
+              function setTips(data, text) {
+                if (drawFlag) return;
+                const { clientX: x, clientY: y } = d3.event;
+                let target;
+                if (tips[data.name]) {
+                  target = tips[data.name];
+                  target.attr("display", "block");
+                } else {
+                  target = svg.append("g");
+                  target
+                    .append("rect")
+                    .attr("width", 100)
+                    .attr("height", 100)
+                    .attr("fill", "red")
+                    .attr("rx", 10)
+                    .attr("ry", 10);
+                  target
+                    .append("text")
+                    .text(text || data.name)
+                    .attr("fill", "white")
+                    .attr("x", 20)
+                    .attr("y", 20)
+                    .attr("text-anchor", "start")
+                    .style("font-size", "20px")
+                    .style("user-select", "none")
+                    .style("color", "blue")
+                    .attr("dy", 8);
+                  tips[data.name] = target;
+                }
+                target.select("text").attr("x", x + 20);
+                target.select("text").attr("y", y + 20);
+                target.select("rect").attr("x", x);
+                target.select("rect").attr("y", y);
+              }
+              function setLinkNumber(group, type) {
+                if (group.length == 0) return;
+                //对该分组内的关系按照方向进行分类，此处根据连接的实体ASCII值大小分成两部分
+                var linksA = [],
+                  linksB = [];
+                for (var i = 0; i < group.length; i++) {
+                  var link = group[i];
+                  if (link.source < link.target) {
+                    linksA.push(link);
+                  } else {
+                    linksB.push(link);
+                  }
+                }
+                //确定关系最大编号。为了使得连接两个实体的关系曲线呈现对称，根据关系数量奇偶性进行平分。
+                //特殊情况：当关系都是连接到同一个实体时，不平分
+                var maxLinkNumber = 0;
+                if (type == "self") {
+                  maxLinkNumber = group.length;
+                } else {
+                  maxLinkNumber =
+                    group.length % 2 == 0 ? group.length / 2 : (group.length + 1) / 2;
+                }
+                //如果两个方向的关系数量一样多，直接分别设置编号即可
+                if (linksA.length == linksB.length) {
+                  var startLinkNumber = 1;
+                  for (var i = 0; i < linksA.length; i++) {
+                    linksA[i].linknum = startLinkNumber++;
+                  }
+                  startLinkNumber = 1;
+                  for (var i = 0; i < linksB.length; i++) {
+                    linksB[i].linknum = startLinkNumber++;
+                  }
+                } else {
+                  //当两个方向的关系数量不对等时，先对数量少的那组关系从最大编号值进行逆序编号，然后在对另一组数量多的关系从编号1一直编号到最大编号，再对剩余关系进行负编号
+                  //如果抛开负号，可以发现，最终所有关系的编号序列一定是对称的（对称是为了保证后续绘图时曲线的弯曲程度也是对称的）
+                  var biggerLinks, smallerLinks;
+                  if (linksA.length > linksB.length) {
+                    biggerLinks = linksA;
+                    smallerLinks = linksB;
+                  } else {
+                    biggerLinks = linksB;
+                    smallerLinks = linksA;
+                  }
+
+                  var startLinkNumber = maxLinkNumber;
+                  for (var i = 0; i < smallerLinks.length; i++) {
+                    smallerLinks[i].linknum = startLinkNumber--;
+                  }
+                  var tmpNumber = startLinkNumber;
+
+                  startLinkNumber = 1;
+                  var p = 0;
+                  while (startLinkNumber <= maxLinkNumber) {
+                    biggerLinks[p++].linknum = startLinkNumber++;
+                  }
+                  //开始负编号
+                  startLinkNumber = 0 - tmpNumber;
+                  for (var i = p; i < biggerLinks.length; i++) {
+                    biggerLinks[i].linknum = startLinkNumber++;
+                  }
+                }
+              }
+              function drawSquare() {
+                var rect = svg
+                  .append("rect")
+                  .attr("width", 0)
+                  .attr("height", 0)
+                  .attr("fill", "rgba(33,20,50,0.3)")
+                  .attr("stroke", "#ccc")
+                  .attr("stroke-width", "2px")
+                  .attr("transform", "translate(0,0)")
+                  .attr("id", "squareSelect");
+
+                svg.on("mousedown", function () {
+                  if (d3.event.target.localName === "svg") {
+                    clickTime = new Date().getTime(); //mark start time
+                    drawFlag = true; //以drawFlag作为可执行圈选的标记
+                    // rect.attr('x',d3.event.layerX)
+                    // rect.attr('y',d3.event.layerY)
+                    rect.attr(
+                      "transform",
+                      "translate(" + d3.event.layerX + "," + d3.event.layerY + ")"
+                    );
+                    rect.attr("endX", d3.event.layerX);
+                    rect.attr("endY", d3.event.layerY);
+                    startLoc = [d3.event.layerX, d3.event.layerY];
+                  }
+                });
+
+                svg.on("mousemove", function () {
+                  //判断事件target
+                  if (drawFlag == true) {
+                    var width = d3.event.layerX - startLoc[0];
+                    var height = d3.event.layerY - startLoc[1];
+                    let endX, endY;
+                    // 各种反向
+                    if (width < 0) {
+                      rect.attr(
+                        "transform",
+                        "translate(" + d3.event.layerX + "," + startLoc[1] + ")"
+                      );
+                      endX = d3.event.layerX;
+                      endY = startLoc[1];
+                    }
+                    if (height < 0) {
+                      rect.attr(
+                        "transform",
+                        "translate(" + startLoc[0] + "," + d3.event.layerY + ")"
+                      );
+                      endX = startLoc[0];
+                      endY = d3.event.layerY;
+                    }
+                    if (height < 0 && width < 0) {
+                      rect.attr(
+                        "transform",
+                        "translate(" + d3.event.layerX + "," + d3.event.layerY + ")"
+                      );
+
+                      endX = d3.event.layerX;
+                      endY = d3.event.layerY;
+                    }
+                    endX && rect.attr("endX", endX);
+                    endY && rect.attr("endY", endY);
+                    rect
+                      .attr("width", Math.abs(width))
+                      .attr("height", Math.abs(height));
+                  }
+                });
+
+                svg.on("mouseup", function () {
+                  var times = new Date().getTime() - clickTime;
+                  if (drawFlag == true && times >= 100) {
+                    d3.selectAll(".regionNode").attr("temp", function (d) {
+                      console.log(d);
+                      endLoc = [d3.event.layerX, d3.event.layerY]; // 框选结束的点的坐标
+                      if (inSquare(d, endLoc)) {
+                        console.log(this);
+                        d3.select(this)
+                          .style("fill", function (d) {
+                            return this.nodeName === "path" ? "" : "pink";
+                          })
+                          .style("stroke", function (d) {
+                            return this.nodeName === "path" ? "pink" : "";
+                          });
+                      }
+                    });
+                    rect
+                      .attr("width", 0)
+                      .attr("height", 0)
+                      .attr("endX", 0)
+                      .attr("endY", 0)
+                      .attr("opacity", 1);
+                  }
+                  drawFlag = false;
+                });
+              }
+              drawSquare();
+
+            function drawThumb() {
+              //每次绘制前删除之前的图形（这是一种简单有效的动画理论，但是比较消耗资源，之后会介绍如何节省资源完成需求）
+              d3.select("#thumbSvg").remove();
+
+              var thumbSvg = d3
+                .select("#thumbMap")
+                .append("svg")
+                .attr("width", 100)
+                .attr("height", 100)
+                .attr("id", "thumbSvg");
+                let thumbPath = drawPath(thumbSvg,'thumb');
+                thumbPath.attr("d",(d)=>{
+                  return pathD(d,'thumb');
+                });
+
+                thumbSvg.append("g")
+                .selectAll("circle")
+                    .data(circle[0])
+                    .enter()
+                    .append("circle")
+                    .attr("class","tnode")
+                    .attr("r",5)//图形尺寸都要缩小
+                    .attr("fill",function(d){
+                      return "red"
+                    })
+                    .attr("cx", function (d) {
+                          return d.__data__.x/5
+                      })
+                      .attr("cy", function(d){
+                        return d.__data__.y/5
+                      });
+      }
+    </script>
+  </body>
+</html>
