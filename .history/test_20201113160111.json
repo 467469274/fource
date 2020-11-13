@@ -1,0 +1,105 @@
+{
+    "code": "1000000",
+    "message": "SUCCESS",
+    "data": {
+        "dot": [{
+            "id": "1:10.16.190.118",
+            "label": null,
+            "properties": {
+                "firstSeen": "2020-11-12 10:36:51.000",
+                "lastSeen": "2020-11-13 09:55:55.000",
+                "ip": "10.16.190.118",
+                "scount": 1,
+                "dcount": 65693,
+                "scountSuc": 0,
+                "dcountSuc": 0,
+                "city": "内网IP",
+                "country": "0",
+                "isp": "内网IP",
+                "province": "0",
+                "region": "0",
+                "collapsedState": "可疑"
+            }
+        },{
+            "id": "1:180.163.222.74",
+            "label": null,
+            "properties": {
+                "firstSeen": "2020-11-12 16:16:53.000",
+                "lastSeen": "2020-11-13 09:55:55.000",
+                "ip": "180.163.222.74",
+                "scount": 49275,
+                "dcount": 1,
+                "scountSuc": 0,
+                "dcountSuc": 0,
+                "city": "上海市",
+                "country": "中国",
+                "isp": "电信",
+                "province": "上海",
+                "region": "0",
+                "collapsedState": "可疑"
+            }
+        }, {
+            "id": "1:10.160.170.116",
+            "label": null,
+            "properties": {
+                "firstSeen": "2020-11-12 10:36:51.000",
+                "lastSeen": "2020-11-12 16:11:52.000",
+                "ip": "10.160.170.116",
+                "scount": 16402,
+                "dcount": 0,
+                "scountSuc": 0,
+                "dcountSuc": 0,
+                "city": "内网IP",
+                "country": "0",
+                "isp": "内网IP",
+                "province": "0",
+                "region": "0",
+                "collapsedState": "可疑"
+            }
+        }],
+        "line": [
+            {
+            "source": "1:10.16.190.118",
+            "target": "1:180.163.222.74",
+            "label": null,
+            "properties": {
+                "attackChainStage": "信息侦查",
+                "attackChainStageLabel": "I",
+                "firstSeen": "2020-11-13 05:38:37.000",
+                "lastSeen": "2020-11-13 06:02:48.000",
+                "count": 2,
+                "alertLevel": 1,
+                "alertLevelLabel": "轻危",
+                "responseResult": "攻击失败"
+            }
+        }, {
+            "source": "1:10.16.190.118",
+            "target": "1:180.163.222.74",
+            "label": null,
+            "properties": {
+                "attackChainStage": "攻击入侵",
+                "attackChainStageLabel": null,
+                "firstSeen": "2020-11-12 19:23:31.000",
+                "lastSeen": "2020-11-12 20:52:27.000",
+                "count": 3,
+                "alertLevel": 2,
+                "alertLevelLabel": "中危",
+                "responseResult": "攻击失败"
+            }
+        }, {
+            "source": "1:10.160.170.116",
+            "target": "1:10.16.190.118",
+            "label": null,
+            "properties": {
+                "attackChainStage": "命令控制",
+                "attackChainStageLabel": "III",
+                "firstSeen": "2020-11-12 10:36:51.000",
+                "lastSeen": "2020-11-12 16:11:52.000",
+                "count": 24870,
+                "alertLevel": 4,
+                "alertLevelLabel": "严重",
+                "responseResult": "攻击失败"
+            }
+        }]
+    }
+}
